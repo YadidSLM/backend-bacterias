@@ -1,0 +1,22 @@
+# Entornos virtuales
+venv/
+env/
+.env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de bases de datos temporales (si los generas localmente)
+*.sqlite3
+instance/
+
+# Archivos de configuración secretos
+*.env
+.env.*
+
+# Archivos de log
+*.log
+
+# VS Code u otros editores
+.vscode/
+.idea/
