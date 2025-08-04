@@ -6,6 +6,9 @@ __pycache__/
 *.pyc
 *.pyo
 
+#Configuración del vscode del desarrollador
+vscode/
+
 # Archivos de bases de datos temporales (si los generas localmente)
 *.sqlite3
 instance/
