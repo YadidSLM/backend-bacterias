@@ -6,6 +6,9 @@ __pycache__/
 *.pyc
 *.pyo
 
+#Archivos de los que se hace el archivo .sql
+archivos/
+
 #Configuración del vscode del desarrollador
 vscode/
 
