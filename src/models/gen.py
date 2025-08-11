@@ -2,7 +2,7 @@ from src.management_db.db import db
 
 class Gen(db.Model):
     __tablename__ = 'gen'
-    id_gen = db.Column(db.Integer, primary_key=True)
+    id_gen = db.Column(db.Integer, primary_key=True, autoincrement=True)
     locus_tag = db.Column(db.String(20), unique = True, nullable=False)
 
     nodo = db.relationship('Nodo', back_populates='gen')
