@@ -1,11 +1,12 @@
 from src.management_db.db import db
 
 class Expresion(db.Model):
-    __tablename__ = 'expreesion'
+    __tablename__ = 'expresion'
 
     id_gen = db.Column(db.Integer, db.ForeignKey('gen.id_gen'), primary_key=True)
-    id_muestra = db.Column(db.Integer, unique=True, nullable=False) #Este valor puede estar ligado al id de l atabla Muestra, en este caso se insertan los valores de las columnas de la tabla colombosBacteria.txt
-    expresion = db.Column(db.Integer, nullable=False)
+    id_muestra = db.Column(db.Integer, nullable=False, primary_key=True) #Este valor podría estar ligado al id de la tabla Muestra, en este caso se insertan los valores de las columnas de la tabla colombosBacteria.txt
+    #Se colocó como llave priamria para que permitiera introcudir más de un valor de id_gen para cada muestra, además, si se añaden todas las tablas sería una llave foránea de Muestra
+    expresion = db.Column(db.Float, nullable=False) 
 
     gen = db.relationship('Gen', back_populates='expresiones')
 
