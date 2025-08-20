@@ -7,6 +7,8 @@ from src.models import Gen, Nodo, Arista, Coexp_modulo, Expresion
 base_dir = os.path.dirname(os.path.abspath(__file__))
 file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Sente', 'colomboslt2.txt')
 file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Sente', 'SignedCytoscapeInput-nodes-lt2.txt')
+file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Sente', 'Signed-CytoscapeInput-edges-lt2.txt')
+#Signed-CytoscapeInput-edges-lt2.txt
 
 
 colombosBacteria = pd.read_table(file_path_colombos)
@@ -15,6 +17,8 @@ nodeModule = pd.read_table(file_path_modulo)
 modulo = []
 locusTag = []
 expresion = []
+nodosList =[]
+
 
 #Cargar módulos (colores)
 for row in nodeModule['nodeAttr[nodesPresent, ]']: #Cargar modulos en una lista sin repetirlos
@@ -34,6 +38,7 @@ with app.app_context():
          modulo.clear() #Libera espacio al borrar la lista de módulo que ya no se usa
          print("Ya se tienen estos modulos en la BD")
 
+#.itertuplas
 
 
 #Cargar genes
@@ -66,6 +71,13 @@ valores nulos e indicar cuáles son para saber si cambiarlos a cero o no
 dependiendo si la base de datos permite esos valores NaN y guardar la fila en
 otra lista de listas con el primer índice el locus tag y su contenido
 cada una de las muestras (fila extraida), por último iterar sobre ca
+
+El tipo de dato float sí acepta valores NaN como registros, los int no,
+Se saca cada fila de locus con sus muestras, se convierte a una lista,
+luego se itera en cada valor de la lista para tener las expresiones una por una,
+una vez que termiana la última muestra del locus, con el for que itera sobre todos los
+genes, cambia al que sigue y vuelve a hacer lo mismo, tarda en ejecutarse, pues
+su complejidad es n^2.
 """
 print(type(colombosBacteria.loc[0]))
 
@@ -88,8 +100,44 @@ with app.app_context():
                     db.session.commit()
     except:
         db.session.rollback()
-        locusTag.clear()
+        all_LocusTags.clear()
         print("Ya se tienen las expresiones de colombos.txt en la BD")
+
+#Cargar nodos
+"""
+Busca en la tabla cada nodeName con su respectivo módulo, pasa los datos de dataFrame a una lista de tuplas,
+descompone las tuplas en nodeName y module y obtiene su id_gen e id_módulo de la base de datos para verificar
+que ya se hayan ingresado esos genes y módulos y para obtener sus ids que se ingrean en la tabla nodo, luego
+inserta el id_gen en la columna de la tabla Nodo con su respectivo id_modulo, id_nodo se autoincrementa.
+En caso de que haya en la tabla .txt más nodos que no estén en colombos, guardarlos en una lista y
+pregntar a Edgardo qué hacer con esos. No fue el caso.
+"""
+nodosDataFrame = nodeModule.loc[0:, ["nodeName", "nodeAttr[nodesPresent, ]"]]
+nodosList = nodosDataFrame.values.tolist()
+with app.app_context():
+    print("Entró en la app nodos")
+    try:
+        for row in nodosList:
+            nodeName, module = row
+            gen = db.session.query(Gen).filter(Gen.locus_tag == nodeName).one() #Saca el gen que tiene módulo, esos genes que tienen módulo son nodeName que se obtiene de la tabla.
+            moduleColor = db.session.query(Coexp_modulo).filter(Coexp_modulo.nombre_modulo == module).one()
+            #Nodos
+            # print(f"id_gen: {gen.locus_tag}, id_coexp_modulo: {moduleColor.nombre_modulo}")
+            if(gen and moduleColor):
+                print(f"id_gen: {gen.id_gen}, id_coexp_modulo: {moduleColor.id_coexp_modulo}")
+                new_nodo = Nodo(id_gen = gen.id_gen, id_coexp_modulo = moduleColor.id_coexp_modulo)
+                db.session.add(new_nodo)
+                db.session.commit()
+            else:
+                print("No se obtuvieron datos requeridos")
+        else:
+            print("Nodos registrados en la BD")
+    except:
+        print("Salió")
+        db.session.rollback()
+        print("Ya se tienen estos nodos de nodes.txt en la BD")
+
+        
 # locus_tag = 'PSLT099'
 # # all_locus_expr = colombosBacteria.loc[colombosBacteria['LocusTag'] == id_locus_tag]
 # locus_expr = colombosBacteria[colombosBacteria['LocusTag'].str.contains(locus_tag)] #Regresa la columna que tiene el contains 
