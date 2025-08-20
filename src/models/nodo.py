@@ -5,7 +5,7 @@ class Nodo(db.Model):
 
     id_nodo = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_gen = db.Column(db.Integer, db.ForeignKey('gen.id_gen'), nullable=False)
-    id_coexp_modulo = db.Column(db.Integer, db.ForeignKey('coexp_modulo.id_coexp_modulo'), nullable="False")
+    id_coexp_modulo = db.Column(db.Integer, db.ForeignKey('coexp_modulo.id_coexp_modulo'), nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint('id_gen', 'id_coexp_modulo', name = 'unico_gen_modulo'),
