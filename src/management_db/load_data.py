@@ -13,6 +13,7 @@ file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Sente', 'Signed-Cy
 
 colombosBacteria = pd.read_table(file_path_colombos)
 nodeModule = pd.read_table(file_path_modulo)
+aristasDataFrame = pd.read_table(file_path_aristas)
 
 modulo = []
 locusTag = []
@@ -25,7 +26,7 @@ for row in nodeModule['nodeAttr[nodesPresent, ]']: #Cargar modulos en una lista 
     if not(row in modulo):
         modulo.append(row)
 with app.app_context():
-    print("Entro a la app")
+    print("Entro a la app módulos")
     try: #Si no hay registros en la base de datos
         for color in modulo:
             new_modulo = Coexp_modulo(nombre_modulo=color)
@@ -46,7 +47,7 @@ for row in colombosBacteria['LocusTag']:
     if not(row in locusTag): #Asegura que no hay valores repetidos de locus tag
         locusTag.append(row)
 with app.app_context():
-    print("Entro a la app")
+    print("Entro a la app genes")
     try:
         for gen in locusTag:
             new_locus_tag = Gen(locus_tag=gen)
@@ -79,10 +80,9 @@ una vez que termiana la última muestra del locus, con el for que itera sobre to
 genes, cambia al que sigue y vuelve a hacer lo mismo, tarda en ejecutarse, pues
 su complejidad es n^2.
 """
-print(type(colombosBacteria.loc[0]))
 
 with app.app_context():
-    print("Entro a la app")
+    print("Entro a la app expresion")
     try:
         all_LocusTags = db.session.query(Gen.id_gen, Gen.locus_tag).all()
         # locus_tag = 'PSLT099'
@@ -119,8 +119,8 @@ with app.app_context():
     try:
         for row in nodosList:
             nodeName, module = row
-            gen = db.session.query(Gen).filter(Gen.locus_tag == nodeName).one() #Saca el gen que tiene módulo, esos genes que tienen módulo son nodeName que se obtiene de la tabla.
-            moduleColor = db.session.query(Coexp_modulo).filter(Coexp_modulo.nombre_modulo == module).one()
+            gen = db.session.query(Gen).filter(Gen.locus_tag == nodeName).one_or_none() #Saca el gen que tiene módulo, esos genes que tienen módulo son nodeName que se obtiene de la tabla.
+            moduleColor = db.session.query(Coexp_modulo).filter(Coexp_modulo.nombre_modulo == module).one_or_none()
             #Nodos
             # print(f"id_gen: {gen.locus_tag}, id_coexp_modulo: {moduleColor.nombre_modulo}")
             if(gen and moduleColor):
@@ -130,14 +130,38 @@ with app.app_context():
                 db.session.commit()
             else:
                 print("No se obtuvieron datos requeridos")
+                break
         else:
             print("Nodos registrados en la BD")
     except:
-        print("Salió")
         db.session.rollback()
         print("Ya se tienen estos nodos de nodes.txt en la BD")
 
+dfArista_FN_TN_W = aristasDataFrame.loc[0:, ["fromNode", "toNode", "weight"]] #df es dataframe
+with app.app_context():
+    print("Entró en la app aristas")
+    try:
+        for row in dfArista_FN_TN_W.itertuples(index = False, name = None):
+            fromNode, toNode, peso = row
+            fromNode_value = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == fromNode).one_or_none()
+            toNode_value = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == toNode).one_or_none()
+            if fromNode_value and toNode_value:
+                new_arista = Arista(id_from_node = fromNode_value.id_nodo, id_to_node = toNode_value.id_nodo, weight = peso)
+                db.session.add(new_arista)
+                db.session.commit()
+                print(f"{fromNode_value.id_gen}: {fromNode}, {toNode_value.id_gen}: {toNode}, weight: {peso}")
+            else:
+                #Estos genes tienen baja correlación 
+
+                print(f"No se encuentran los locus_tag de la tabla edges.txt: fromNode: {fromNode}, toNode: {toNode} en la BD")
+    except Exception as e:
+        db.session.rollback()
+        print("Error al insertar aristas:", str(e))
         
+        # print("Ya se tienen registrados las aristas en la BD.")
+        
+
+    
 # locus_tag = 'PSLT099'
 # # all_locus_expr = colombosBacteria.loc[colombosBacteria['LocusTag'] == id_locus_tag]
 # locus_expr = colombosBacteria[colombosBacteria['LocusTag'].str.contains(locus_tag)] #Regresa la columna que tiene el contains 
