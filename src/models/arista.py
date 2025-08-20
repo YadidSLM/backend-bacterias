@@ -3,7 +3,7 @@ from src.management_db.db import db
 class Arista(db.Model):
     __tablename__ = 'arista'
 
-    id_arista = db.Column(db.Integer, primary_key=True)
+    id_arista = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_from_node = db.Column(db.Integer, db.ForeignKey('nodo.id_nodo'), nullable=False)
     id_to_node = db.Column(db.Integer, db.ForeignKey('nodo.id_nodo'), nullable=False)
     weight = db.Column(db.Float)
