@@ -11,4 +11,4 @@ class Expresion(db.Model):
     gen = db.relationship('Gen', back_populates='expresiones')
 
     def __repr__(self):
-        return f"id_expresion: {self.id_expresion}, id_muestra: {self.id_muestra}, expresion_valor: {self.expresion}"
+        return f"<Expresion id_gen = {self.id_gen}, id_muestra = {self.id_muestra}, expresion_valor = {self.expresion}>\n"
