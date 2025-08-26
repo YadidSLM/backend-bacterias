@@ -95,6 +95,9 @@ with app.app_context():
                 if type(expr) is str:
                     print(f"{id_sample}, {expr}") #Este es el locus tag en cadena, por eso se aparta este valor y no se ingresa en la base de datos.            
                 else:
+                    if pd.isna(expr):
+                        print(expr)
+                        expr = 0
                     new_expresion = Expresion(id_gen=id_locus_tag, id_muestra=id_sample, expresion=expr)
                     db.session.add(new_expresion)
                     db.session.commit()
@@ -138,6 +141,7 @@ with app.app_context():
         print("Ya se tienen estos nodos de nodes.txt en la BD")
 
 dfArista_FN_TN_W = aristasDataFrame.loc[0:, ["fromNode", "toNode", "weight"]] #df es dataframe
+edges_not_in_nodes = []
 with app.app_context():
     print("Entró en la app aristas")
     try:
@@ -151,16 +155,17 @@ with app.app_context():
                 db.session.commit()
                 print(f"{fromNode_value.id_gen}: {fromNode}, {toNode_value.id_gen}: {toNode}, weight: {peso}")
             else:
-                #Estos genes tienen baja correlación 
-
+                #Estos genes tienen baja correlación, por eso no están en nodos.
+                edges_not_in_nodes.append((fromNode, toNode, peso))
                 print(f"No se encuentran los locus_tag de la tabla edges.txt: fromNode: {fromNode}, toNode: {toNode} en la BD")
+    
     except Exception as e:
         db.session.rollback()
-        print("Error al insertar aristas:", str(e))
+        print("Ya etsán los datos en la BD o Error al insertar aristas:", str(e)) #El error es que no había nodos (de dfArista_FN_TN_W) en la BD nodo (y tampoco están en cyto..nodes.txt pues de esa tabla se llenó la tabla nodo), para que no cayera en el error se cambió de one() a one_or_none() para saber qué aristas intenta hacer la relación de la tabla edges.txt, pero no puede porque no están en nodos.
         
         # print("Ya se tienen registrados las aristas en la BD.")
         
-
+print(edges_not_in_nodes) #Estaba viendo las tablas y veo que sí se contempla una relación entre esos genes con un peso, pero no están en la de nodos con su módulo, ¿es cierto que no se incluyen en nodos aquellos genes que no tienen una relación tan fuerte?
     
 # locus_tag = 'PSLT099'
 # # all_locus_expr = colombosBacteria.loc[colombosBacteria['LocusTag'] == id_locus_tag]
