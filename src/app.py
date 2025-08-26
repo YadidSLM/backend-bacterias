@@ -3,6 +3,8 @@ from src.config import Config
 from flask_cors import CORS
 from src.management_db.db import db
 
+from src.services.services_expresion import expresion_app
+
 app = Flask(__name__)
 app.config.from_object(Config) #Carga atributos de la clase Config como variables de configuración para tu aplicación. Le dice a la app cómo conectarse con postgres.
 
@@ -16,6 +18,9 @@ with app.app_context(): # with (una estructra de control que maneja contextos) p
     db.create_all() # Crea las tablas gracias a lo definido en db en models.py y sabe dónde crearlas por el with de arriba.
 
 """
+
+app.register_blueprint(expresion_app, url_prefix = '/expresion')
+
 
 @app.route('/') #Las rutas se implementan con decoradores.
 def index():
