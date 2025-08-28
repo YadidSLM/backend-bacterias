@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 from src.models import Expresion, Gen
 from src.management_db.db import db
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg') #Evita el error de que se usan funciones para graficar, pero sin la ventana emergente.
 import matplotlib.pyplot as plt
 import base64
 import io
@@ -27,7 +27,7 @@ def getLocusExprBoxplot(locusTag):
     gen = db.session.query(Gen).filter(Gen.locus_tag == locusTag).one()
     expr = Expresion.query.filter_by(id_gen = gen.id_gen).all()
     
-    expr_list = [ex.expresion for ex in expr] #de cada objeto ex obtiene su atributo expresion
+    expr_list = [ex.expresion for ex in expr] #De cada objeto ex obtiene su atributo expresion
 
     fig, ax = plt.subplots(figsize=(6,4))
     ax.boxplot(expr_list)
