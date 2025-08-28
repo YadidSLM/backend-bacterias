@@ -17,4 +17,4 @@ class Nodo(db.Model):
     arista_to = db.relationship('Arista', foreign_keys='Arista.id_to_node', back_populates='to_node')
 
     def __repr__(self):
-        return f"id_nodo: {self.id_nodo}, id_gen: {self.id_gen}, id_coexp_modulo: {self.id_coexp_modulo}"
+        return f"<Nodo id_nodo = {self.id_nodo}, id_gen = {self.id_gen}, id_coexp_modulo = {self.id_coexp_modulo}>"
