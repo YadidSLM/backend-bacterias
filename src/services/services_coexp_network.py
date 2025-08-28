@@ -53,9 +53,26 @@ def getCoexprNetwork(locusTag):
         arista_FNTNW_list.append(edge)
 
     G = nx.Graph()
-    
+    nx_node_color = []
+    for nod, col in node_with_color_list:
+        nx_node_color.append((nod, {"color" : col})) #Se alade una tupla con la segunda localidad un diccionario porque así lo lee networkinx
+    G.add_nodes_from(nx_node_color)
+    G.add_weighted_edges_from(arista_FNTNW_list)
 
-    fig, ax = plt.subplots(figsize=(6,4))
+    colores = []
+    for _, dicciColorlor in G.nodes(data=True):
+        colores.append(dicciColorlor["color"])
+    pesos = []
+    for _,_,dicciAristasNx in G.edges(data=True): #G.edges(data=True) coloca el atributo weight en un diccionario.
+        pesos.append(dicciAristasNx["weight"] * 10)
+    
+    nodePositions = nx.spring_layout(G, seed=42, k=0.8)
+
+    fig, ax = plt.subplots(figsize=(10,8))
+    nx.draw_networkx_nodes(G, nodePositions, node_color=colores, node_size=1500, ax=ax)
+    nx.draw_networkx_edges(G, nodePositions, width=pesos, edge_color="gray", ax = ax)
+    nx.draw_networkx_labels(G, nodePositions, font_size=7, font_color="black", font_weight="bold", horizontalalignment="center", verticalalignment="center", ax = ax)
+    ax.axis("off")
     
     #Red de coexpresión
 
@@ -63,7 +80,7 @@ def getCoexprNetwork(locusTag):
 
     return jsonify({
         "locus" : locusTag,
-        # "img" : img_data,
+        "img" : img_data,
         "Nodo" : f"{idnodo}, {suLocus}, {suColor}",
         "Tipo Arista" : f"{type(aristasRaw)}",
         "Arista" : f"{aristasRaw}",
