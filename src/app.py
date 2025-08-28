@@ -4,6 +4,7 @@ from flask_cors import CORS
 from src.management_db.db import db
 
 from src.services.services_expresion import expresion_app
+from src.services.services_coexp_network import coexp_network
 
 app = Flask(__name__)
 app.config.from_object(Config) #Carga atributos de la clase Config como variables de configuración para tu aplicación. Le dice a la app cómo conectarse con postgres.
@@ -20,6 +21,7 @@ with app.app_context(): # with (una estructra de control que maneja contextos) p
 """
 
 app.register_blueprint(expresion_app, url_prefix = '/expresion')
+app.register_blueprint(coexp_network, url_prefix = '/coexpresion_network')
 
 
 @app.route('/') #Las rutas se implementan con decoradores.
