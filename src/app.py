@@ -24,7 +24,7 @@ app.register_blueprint(expresion_app, url_prefix = '/expresion')
 app.register_blueprint(coexp_network, url_prefix = '/coexpresion_network')
 
 
-@app.route('/') #Las rutas se implementan con decoradores.
+@app.route('/') #Las rutas se implementan con decoradores de python.
 def index():
     return "it works"
 
