@@ -1,14 +1,25 @@
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
-# Cargar las variables de entorno desde el archivo .env
+# Cargar variables del archivo .env
 load_dotenv()
-"""
-for key, val in os.environ.items():
-    print(f"{key} = {val}")
-"""
+
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://postgres:' + os.environ.get('DB_PASSWORD') + '@localhost:5432/bacterias'
-    #os.environ.get() es una forma de leer variables de entorno del sistema, os es un módulo estandard de python que sirve para interactuar con el sistema operativo.
-    #Busca la variable de entorno 'DATABASE_URL' si no la encuentra construye la URL con la variable de entorno 'DB_PASSWORD' y esto es para no ver la constraseña de la BD en el código.
+    # Escapar la contraseña en caso de caracteres especiales
+    DB_PASSWORD = quote_plus(os.environ.get('DB_PASSWORD', ''))
+    
+    # Construir la URL de SQLAlchemy
+    SQLALCHEMY_DATABASE_URI = (
+        f"postgresql://{os.environ.get('DB_USER', 'postgres')}:{DB_PASSWORD}"
+        f"@{os.environ.get('DB_HOST', 'localhost')}:{os.environ.get('DB_PORT', '5432')}/"
+        f"{os.environ.get('DB_NAME', 'bacterias_db')}"
+    )
+
+    # Evitar warnings de Flask-SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    #Para ver tablas entrar a postgres desde la terminal con: psql -h localhost -U bacterias_user -d bacterias
+    #Ver tablas con: \dt
+    #Salir de psql con: \q
+    #Describir tabla con: \d nombre_de_la_tabla
