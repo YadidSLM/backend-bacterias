@@ -4,3 +4,4 @@ from .nodo import Nodo
 from .coexp_modulo import Coexp_modulo
 from .arista import Arista
 from .expresion import Expresion
+from .bacteria import Bacteria
