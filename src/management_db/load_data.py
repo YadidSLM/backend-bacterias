@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from src.management_db.db import db #Corre desde la terminal en backend-bacterias con python -m src.management_db.load_data
 from src.app import app
-from src.models import Gen, Nodo, Arista, Coexp_modulo, Expresion
+from src.models import Gen, Nodo, Arista, Coexp_modulo, Expresion, Bacteria
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'colombosypest.txt')
@@ -19,6 +19,41 @@ modulo = []
 locusTag = []
 expresion = []
 nodosList =[]
+#Cargar bacterias
+"""
+id_bacteria  bacteria
+1   Ypest
+2   Tther
+3   Spneu
+4   Smeli   Para cargar archivos de otras bacterias, cambiar el nombre de los archivos colombos, nodes y edges a los de la bacteria que se quiera cargar.
+5   Sflex   Y cambiar bacterias[0] en la línea 89 por el índice de la bacteria que se quiera cargar, por ejemplo, para Mtube es bacterias[7] .
+6   Sente
+7   Paeru
+8   Mtube
+9   Lrham
+10  Hpylo
+11  Ecoli
+12  CjejuB).j
+13  Cacet
+14  Bthet
+15  Bsubt
+16  Bcere
+17  Banth
+"""
+bacterias = ["Ypest", "Tther", "Spneu", "Smeli", "Sflex", "Sente", "Paeru", "Mtube", "Lrham", "Hpylo", "Ecoli", "Cjeju", "Cacet", "Bthet", "Bsubt", "Bcere", "Banth"]#Lista de bacterias
+with app.app_context():
+    print("Entro a la app bacterias")
+    try: #Si no hay registros en la base de datos
+        for bacteria in bacterias:
+            new_bacteria = Bacteria(bacteria=bacteria)
+            db.session.add(new_bacteria)
+            db.session.commit()
+        else: #Al terminar el for
+            print("Bacterias registradas en la DB")
+    except:
+         db.session.rollback() #Hace que cancele los session.add y no se suban en el siguiente commit()
+         print("Ya se tienen estas bacterias en la BD")
+    
 
 print(nodeModule.columns)
 #Cargar módulos (colores)
@@ -48,18 +83,24 @@ for row in colombosBacteria['LocusTag']:
         locusTag.append(row)
 with app.app_context():
     print("Entro a la app genes")
+    #bact = db.session.query(Bacteria).filter(Bacteria.bacteria == bacteria[0]).one_or_none() #Por ahora todos son de Ypest, id_bacteria=1, bacterias[0] es Ypest
+    bact = db.session.query(Bacteria).filter(Bacteria.bacteria == bacterias[0]).one_or_none() #Por ahora todos son de Ypest, id_bacteria=1, bacterias[0] es Ypest
+    print(f"bacteria: {bact.bacteria}, id_bacteria: {bact.id_bacteria}")
     try:
-        for gen in locusTag:
-            new_locus_tag = Gen(locus_tag=gen)
-            db.session.add(new_locus_tag)
-            db.session.commit()
+        if bact:
+            for gen in locusTag:
+                new_locus_tag = Gen(locus_tag=gen, id_bacteria=bact.id_bacteria) #Se obtiene el id_bacteria de la consulta anterior
+                db.session.add(new_locus_tag)
+                db.session.commit()
+            else:
+                print("Genes registrados en la DB")
         else:
-            print("Genes registrados en la DB")
-    except:
-         db.session.rollback()
-         locusTag.clear()
-         print("Ya se tienen estos genes en la BD")
-
+            print("No se encontró la bacteria")
+    except Exception as e:
+        db.session.rollback()
+        locusTag.clear()
+        print("Ya etsán los datos en la BD o Error al insertar genes:", str(e))
+    #raise SystemExit #Sale del programa si ya están los genes, pues las demás tablas dependen de estos.
 #Cargar expresiones a tabla expresión
 # print(colombosBacteria['2'].head(10))
 # for row in colombosBacteria['LocusTag']:
