@@ -5,9 +5,9 @@ from src.app import app
 from src.models import Gen, Nodo, Arista, Coexp_modulo, Expresion
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Sente', 'colomboslt2.txt')
-file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Sente', 'SignedCytoscapeInput-nodes-lt2.txt')
-file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Sente', 'Signed-CytoscapeInput-edges-lt2.txt')
+file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'colombosypest.txt')
+file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'SignedCytoscapeInput-nodes-ypest-Bicor00.txt')
+file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'Signed-CytoscapeInput-edges-ypest-Bicor00.txt')
 #Signed-CytoscapeInput-edges-lt2.txt
 
 
@@ -20,7 +20,7 @@ locusTag = []
 expresion = []
 nodosList =[]
 
-
+print(nodeModule.columns)
 #Cargar módulos (colores)
 for row in nodeModule['nodeAttr[nodesPresent, ]']: #Cargar modulos en una lista sin repetirlos
     if not(row in modulo):
