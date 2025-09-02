@@ -26,3 +26,6 @@ instance/
 # VS Code u otros editores
 .vscode/
 .idea/
+
+# Archivo de pip
+get-pip.py
