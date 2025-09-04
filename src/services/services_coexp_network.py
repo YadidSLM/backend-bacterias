@@ -33,8 +33,19 @@ def fig_to_base64(fig, fmt="svg"): #Convierte la gráfica a imagen svg y luego a
 @coexp_network.route('/get-network/<locusTag>', methods = ['GET'])
 def getCoexprNetwork(locusTag):
     #Obtener el módulo del locus tag ingresado en la url
-    node = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == locusTag).one_or_none()
+    node = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == locusTag).one_or_none() #Si se le pone all() regresa una lista, si se pone one_or_none() regresa el objeto o None
+    #SELECT *  FROM arista NATURAL JOIN nodo NATURAL JOIN gen WHERE locus_tag = 'YPCD1.09c' 
+    #SELECT fromNode, toNode, weight  FROM arista NATURAL JOIN nodo NATURAL JOIN gen WHERE locus_tag = 'YPCD1.09c' 
     #Obtener la arista cuyo fromNode tenga el locus ingresado.
+    """
+    Esta puede ser la consulta corregida para obtener las aristas del nodo buscado:
+    resultados = db.session.query(Arista)\
+    .join(Arista.nodo)\
+    .join(Nodo.gen)\
+    .filter(Gen.locus_tag == 'YPCD1.09c')\
+    .all()
+
+    """
     idnodo = node.id_nodo
     # aristasRaw = db.session.query(Arista).filter(Arista.id_arista == idnodo).one_or_none()
     suColor = node.modulo.nombre_modulo
@@ -62,9 +73,9 @@ def getCoexprNetwork(locusTag):
     # aristasRaw = node.arista_to[0].to
     # aristasRaw = node.arista_from[0].from_node.modulo.nombre_modulo #Regresa el módulo del fromNode de esa arista
     """
-    Hacer lista de tuplas de todos los nodos (su locus tag porque se puede acceder al id_nodo o id_modulo) en la arista con su respectivo módulo que no haya nodos repetidos. Done
-    Hacer lista de tuplas de (locusFrom, locusTo, peso) Done
-    *** Después ir a load_data y validar que no se ingresen a la BD aristas que no tengan nodos en cyto_nodes.txt
+    #Hacer lista de tuplas de todos los nodos (su locus tag porque se puede acceder al id_nodo o id_modulo) en la arista con su respectivo módulo que no haya nodos repetidos. Done
+    #Hacer lista de tuplas de (locusFrom, locusTo, peso) Done
+    #*** Después ir a load_data y validar que no se ingresen a la BD aristas que no tengan nodos en cyto_nodes.txt
     """
     node_with_color_list = []
     arista_FNTNW_list = []
@@ -72,10 +83,12 @@ def getCoexprNetwork(locusTag):
     for arista in aristasRaw:
         nodeLocus = arista.to_node.gen.locus_tag
         nodeModule = arista.to_node.modulo.nombre_modulo
+        
         if nodeModule in mcolors.CSS4_COLORS.keys():
             nodeModule = mcolors.CSS4_COLORS[nodeModule]
         else:
             nodeModule = "#a9825a" if nodeModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
+            print(nodeModule, "No se encontró en los colores de matplotlib")
         nodo_and_module = (nodeLocus, nodeModule)
         node_with_color_list.append(nodo_and_module)
 
@@ -87,7 +100,7 @@ def getCoexprNetwork(locusTag):
     #Aquí se puede hacer el mismo ciclo para 
 
     G = nx.Graph()
-
+    print(node_with_color_list)
     for nod, col in node_with_color_list:
         #nx_node_color.append((nod, {"color" : col})) #Se añade una tupla con la segunda localidad un diccionario porque así lo lee networkinx
         G.add_node(nod, color=col) #Se añade el nodo con su atributo color
@@ -103,19 +116,20 @@ def getCoexprNetwork(locusTag):
     for _,_,dicciAristasNx in G.edges(data=True): #G.edges(data=True) coloca el atributo weight en un diccionario.
         pesos.append(dicciAristasNx["weight"] * 20)
     
-    nodePositions = nx.spring_layout(G, seed=42, k=0.8)
+    nodePositions = nx.spring_layout(G, seed=42, k=0.2)
 
     fig, ax = plt.subplots(figsize=(10,8))
     nx.draw_networkx_nodes(G, nodePositions, node_color=colores, node_size=1500, ax=ax)
-    nx.draw_networkx_edges(G, nodePositions, width=pesos, edge_color="gray", ax = ax)
+    nx.draw_networkx_edges(G, nodePositions, width=pesos, edge_color="black", ax = ax)
     nx.draw_networkx_labels(G, nodePositions, font_size=7, font_color="black", font_weight="bold", horizontalalignment="center", verticalalignment="center", ax = ax)
     ax.axis("off")
 
     #Red de coexpresión
 
     img_data = fig_to_base64(fig, fmt=request.args.get("format", "svg").lower())
-
+    
     return jsonify({
+        "nodo" : f"{node}",
         "locus" : locusTag,
         "img" : img_data,
         "Nodo" : f"{idnodo}, {suLocus}, {suColor}",
