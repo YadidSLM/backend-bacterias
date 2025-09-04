@@ -205,7 +205,7 @@ with app.app_context():
         print("Ya etsán los datos en la BD o Error al insertar aristas:", str(e)) #El error es que no había nodos (de dfArista_FN_TN_W) en la BD nodo (y tampoco están en cyto..nodes.txt pues de esa tabla se llenó la tabla nodo), para que no cayera en el error se cambió de one() a one_or_none() para saber qué aristas intenta hacer la relación de la tabla edges.txt, pero no puede porque no están en nodos.
         
         # print("Ya se tienen registrados las aristas en la BD.")
-        
+#Para Ypest, no hay nodos de las aristas que no estén en nodos, SMELI es una bacteria que le faltan datos en sus tablas.
 print(edges_not_in_nodes) #Estaba viendo las tablas y veo que sí se contempla una relación entre esos genes con un peso, pero no están en la de nodos con su módulo, ¿es cierto que no se incluyen en nodos aquellos genes que no tienen una relación tan fuerte?
     
 # locus_tag = 'PSLT099'
