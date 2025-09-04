@@ -81,23 +81,44 @@ def getCoexprNetwork(locusTag):
     arista_FNTNW_list = []
     node_with_color_list.append((suLocus, suColor)) #Ingresa el locus tag y módulo de locus buscado
     for arista in aristasRaw:
-        nodeLocus = arista.to_node.gen.locus_tag
-        nodeModule = arista.to_node.modulo.nombre_modulo
+        nodeTLocus = arista.to_node.gen.locus_tag
+        nodeTModule = arista.to_node.modulo.nombre_modulo
+        nodeFLocus = arista.from_node.gen.locus_tag
+        nodeFModule = arista.from_node.modulo.nombre_modulo
         
-        if nodeModule in mcolors.CSS4_COLORS.keys():
-            nodeModule = mcolors.CSS4_COLORS[nodeModule]
+        if nodeTModule in mcolors.CSS4_COLORS.keys():
+            nodeTModule = mcolors.CSS4_COLORS[nodeTModule]
         else:
-            nodeModule = "#a9825a" if nodeModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
-            print(nodeModule, "No se encontró en los colores de matplotlib")
-        nodo_and_module = (nodeLocus, nodeModule)
-        node_with_color_list.append(nodo_and_module)
+            nodeTModule = "brown" if nodeTModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
+            print(nodeTModule, "No se encontró en los colores de matplotlib")
+        
+        if nodeFModule in mcolors.CSS4_COLORS.keys():
+            nodeFModule = mcolors.CSS4_COLORS[nodeFModule]
+        else:
+            nodeFModule = "brown" if nodeFModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
+            print(nodeFModule, "No se encontró en los colores de matplotlib")
 
+        
+        #Arma la lista con nodos de fromNode y toNode con su respectivo módulo
+        nodo_and_module_to = (nodeTLocus, nodeTModule)
+        nodo_and_module_from = (nodeFLocus, nodeFModule)
+        node_with_color_list.append(nodo_and_module_to)
+        node_with_color_list.append(nodo_and_module_from)
+        
+        #Valida que no se repitan nodos en la lista.
+        revisado = set()
+        nodos_unicos = []
+        for n in node_with_color_list:
+            if n not in revisado:
+                nodos_unicos.append(n)
+                revisado.add(n)
+        node_with_color_list = nodos_unicos
         locusFrom = arista.from_node.gen.locus_tag
         locusTo = arista.to_node.gen.locus_tag
         peso = arista.weight
         edge = (locusFrom, locusTo, peso)
         arista_FNTNW_list.append(edge)
-    #Aquí se puede hacer el mismo ciclo para 
+    
 
     G = nx.Graph()
     print(node_with_color_list)
@@ -135,6 +156,6 @@ def getCoexprNetwork(locusTag):
         "Nodo" : f"{idnodo}, {suLocus}, {suColor}",
         "Tipo Arista" : f"{type(aristasRaw)}",
         "Arista" : f"{aristasRaw}",
-        "Lista de nodos" : f"{node_with_color_list}",
+        "Lista de nodos" : f"{len(node_with_color_list)} ->{node_with_color_list}",
         "Lista aristas" : f"{arista_FNTNW_list}"
     })
