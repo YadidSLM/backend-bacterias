@@ -6,6 +6,7 @@ Backend en **Flask (Python 3.11)** para la graficación de datos de expresión g
 
 - [Python 3.11](https://www.python.org/downloads/release/python-3110/)
 - [PostgreSQL 12 o superior](https://www.postgresql.org/download/)
+- Al menos 7 GB de almacenamiento disponible para la carga de datos a la base de datos.
 
 ## Instalación
 
@@ -67,6 +68,7 @@ https://drive.google.com/drive/folders/1rs2O2_eArKa3i87IL2WOfSW7LKr_eGi0?usp=dri
 - colombos**Nombre de bacteria**.txt
 - Signed-CytoscapeInput-edges-**Nombre de bacteria**-Bicor00.txt
 - SignedCytoscapeInput-nodes-**Nombre de bacteria**-Bicor00.txt
+
 Muévelas a una carpeta llamada con el nombre de la bacteria dentro de la carpeta archivos que está dentro de src como se muestra en el diagrama:
 ```
 backend-bacterias/
@@ -104,6 +106,7 @@ Corra el script con:
 python -m src.management_db.load_data
 ```
 Va a tardar alrededor de 12 horas cargar todos los datos, dependiendo de la bacteria.
+Al finalizar la carga de datos, puede borrar los archvos de la bacteria de la carpeta archivos y puede volver a hacer lo mismo para cargar otra bacteria.
 
 ## Ejecución del servidor
 
