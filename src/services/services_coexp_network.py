@@ -139,7 +139,7 @@ def getCoexprNetwork(locusTag):
     
     nodePositions = nx.spring_layout(G, seed=42, k=0.2)
 
-    fig, ax = plt.subplots(figsize=(10,8))
+    fig, ax = plt.subplots(figsize=(10,8)) #Tamaño de la figura en pulgadas 10 de ancho y 8 de alto
     nx.draw_networkx_nodes(G, nodePositions, node_color=colores, node_size=1500, ax=ax)
     nx.draw_networkx_edges(G, nodePositions, width=pesos, edge_color="black", ax = ax)
     nx.draw_networkx_labels(G, nodePositions, font_size=7, font_color="black", font_weight="bold", horizontalalignment="center", verticalalignment="center", ax = ax)
@@ -152,10 +152,10 @@ def getCoexprNetwork(locusTag):
     return jsonify({
         "nodo" : f"{node}",
         "locus" : locusTag,
-        "img" : img_data,
+        "img" : img_data, #Imagen en base64 de la red de coexpresión.
         "Nodo" : f"{idnodo}, {suLocus}, {suColor}",
         "Tipo Arista" : f"{type(aristasRaw)}",
-        "Arista" : f"{aristasRaw}",
+        "Arista" : f"{aristasRaw}", #Aquí están las 50 aristas fromnode, tonode y weight que se usa para hacer la red y se puede usar para hacer la tabla en el frontend.
         "Lista de nodos" : f"{len(node_with_color_list)} ->{node_with_color_list}",
         "Lista aristas" : f"{arista_FNTNW_list}"
     })

@@ -26,7 +26,7 @@ id_bacteria  bacteria
 2   Tther
 3   Spneu
 4   Smeli   Para cargar archivos de otras bacterias, cambiar el nombre de los archivos colombos, nodes y edges a los de la bacteria que se quiera cargar.
-5   Sflex   Y cambiar bacterias[0] en la línea 89 por el índice de la bacteria que se quiera cargar, por ejemplo, para Mtube es bacterias[7] .
+5   Sflex   Y cambiar bacterias[0] en la línea 89 por el índice de la bacteria que se quiera cargar, por ejemplo, para Mtube es bacterias[7], ojo que el índice es 7 aunque el id_bacteria es 6.
 6   Sente
 7   Paeru
 8   Mtube
@@ -151,13 +151,13 @@ with app.app_context():
 """
 Busca en la tabla cada nodeName con su respectivo módulo, pasa los datos de dataFrame a una lista de tuplas,
 descompone las tuplas en nodeName y module y obtiene su id_gen e id_módulo de la base de datos para verificar
-que ya se hayan ingresado esos genes y módulos y para obtener sus ids que se ingrean en la tabla nodo, luego
+que ya se hayan ingresado esos genes y módulos y para obtener sus ids que se ingresan en la tabla nodo, luego
 inserta el id_gen en la columna de la tabla Nodo con su respectivo id_modulo, id_nodo se autoincrementa.
 En caso de que haya en la tabla .txt más nodos que no estén en colombos, guardarlos en una lista y
 pregntar a Edgardo qué hacer con esos. No fue el caso.
 """
 nodosDataFrame = nodeModule.loc[0:, ["nodeName", "nodeAttr[nodesPresent, ]"]]
-nodosList = nodosDataFrame.values.tolist()
+nodosList = nodosDataFrame.values.tolist() #Lista de tuplas
 with app.app_context():
     print("Entró en la app nodos")
     try:
@@ -202,7 +202,7 @@ with app.app_context():
     
     except Exception as e:
         db.session.rollback()
-        print("Ya etsán los datos en la BD o Error al insertar aristas:", str(e)) #El error es que no había nodos (de dfArista_FN_TN_W) en la BD nodo (y tampoco están en cyto..nodes.txt pues de esa tabla se llenó la tabla nodo), para que no cayera en el error se cambió de one() a one_or_none() para saber qué aristas intenta hacer la relación de la tabla edges.txt, pero no puede porque no están en nodos.
+        print("Ya están los datos en la BD o Error al insertar aristas:", str(e)) #El error es que no había nodos (de dfArista_FN_TN_W) en la BD nodo (y tampoco están en cyto..nodes.txt pues de esa tabla se llenó la tabla nodo), para que no cayera en el error se cambió de one() a one_or_none() para saber qué aristas intenta hacer la relación de la tabla edges.txt, pero no puede porque no están en nodos.
         
         # print("Ya se tienen registrados las aristas en la BD.")
 #Para Ypest, no hay nodos de las aristas que no estén en nodos, SMELI es una bacteria que le faltan datos en sus tablas.
