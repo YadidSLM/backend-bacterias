@@ -122,7 +122,25 @@ El backend quedará corriendo en:
 http://127.0.0.1:4000
 ```
 
-
-✍️ **Nota:** Actualmente no incluye ejemplos de endpoints en este `README.md`. Si en un futuro deseas documentar las rutas de la API (ej. `/get-network/<locusTag>`), se pueden agregar en una sección de **Uso de la API**.
+## Acceder a la base de datos de postgreSQL desde la terminal.
+Verifica que tengas postgres instalado, puedes acceder al manejador de la base de datos con:
+```
+psql -h localhost -U bacterias_user -d bacterias
+```
+Ya dentro puedes hacer las consultas SQL que desees hacer.
+Para ver las tablas puedes ejecutar: `\d`
+Y para salir de postreSQL con: `exit`
 
 ## Uso de la API
+1. Para recibir imagen base 64 de la red de coexpresión.
+Ingresa el locus tag que desees buscar en la siguiente ruta:
+```
+http://127.0.0.1:4000/coexpresion_network/get-network/locus_tag
+```
+
+2. Para recibir imagen base 64 del boxplot.
+Ingresa el locus tag que desees buscar en la siguiente ruta:
+```
+http://127.0.0.1:4000/expresion/boxplot/locus_tag
+```
+Regresa en datos JSON la imagen base 64 la cual puedes copiar y pegar en una nueva ventana de navegador para previsualizarla.
