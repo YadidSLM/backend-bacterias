@@ -70,7 +70,7 @@ https://drive.google.com/drive/folders/1rs2O2_eArKa3i87IL2WOfSW7LKr_eGi0?usp=dri
 - Signed-CytoscapeInput-edges-**Nombre de bacteria**-Bicor00.txt
 - SignedCytoscapeInput-nodes-**Nombre de bacteria**-Bicor00.txt
 
-Muévelas a una carpeta llamada con el nombre de la bacteria dentro de la carpeta archivos que está dentro de src como se muestra en el diagrama:
+Muévelas a una carpeta con el nombre de la bacteria dentro de la carpeta archivos que está dentro de src como se muestra en el diagrama:
 ```
 backend-bacterias/
 │── requirements.txt
