@@ -8,6 +8,10 @@ class Arista(db.Model):
     id_to_node = db.Column(db.Integer, db.ForeignKey('nodo.id_nodo'), nullable=False)
     weight = db.Column(db.Float)
 
+    __table_args__ = (
+        db.UniqueConstraint('id_from_node', 'id_to_node', 'weight', name='uq_arista_from_to_weight'),
+    )
+
     #El atributo de la clase Arista es from_node que permite acceder a from_node de la tabla Nodo. En objetos python
     from_node = db.relationship('Nodo', foreign_keys=[id_from_node], back_populates='arista_from')
     to_node = db.relationship('Nodo', foreign_keys=[id_to_node], back_populates='arista_to')
