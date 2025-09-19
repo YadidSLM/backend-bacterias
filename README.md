@@ -32,6 +32,46 @@ Backend en **Flask (Python 3.11)** para la graficación de datos de expresión g
    pip install -r requirements.txt
    ```
 
+## Estructura del proyecto
+```
+.
+├── Docs
+│   ├── Bacterias_Diagrama_Entidad-Relacion.png
+│   └── schema.sql
+├── .env
+├── .gitignore
+├── README.md
+├── requirements.txt
+└── src
+    ├── app.py
+    ├── archivos
+    │   └── Ypest
+    │       ├── colombosypest.txt
+    │       ├── Signed-CytoscapeInput-edges-ypest-Bicor00.txt
+    │       └── SignedCytoscapeInput-nodes-ypest-Bicor00.txt
+    ├── config.py
+    ├── __init__.py
+    ├── management_db
+    │   ├── create_db.py
+    │   ├── db.py
+    │   ├── drop_db.py
+    │   ├── __init__.py
+    │   └── load_data.py
+    ├── models
+    │   ├── all_models.py
+    │   ├── arista.py
+    │   ├── bacteria.py
+    │   ├── coexp_modulo.py
+    │   ├── expresion.py
+    │   ├── gen.py
+    │   ├── __init__.py
+    │   └── nodo.py
+    └── services
+        ├── __init__.py
+        ├── services_coexp_network.py
+        └── services_expresion.py
+```
+
 ## Configuración de la base de datos
 
 1. Asegúrate de tener PostgreSQL corriendo.
