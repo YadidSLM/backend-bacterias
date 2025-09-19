@@ -11,6 +11,7 @@ Backend en **Flask (Python 3.11)** para la graficación de datos de expresión g
 ## Instalación
 
 1. Clona este repositorio:
+   Asegúrate de estar en la rama bacterias_ubuntu antes de clonar el repo.
 
    ```bash
    git clone https://github.com/YadidSLM/backend-bacterias.git
@@ -129,6 +130,7 @@ psql -h localhost -U bacterias_user -d bacterias
 ```
 Ya dentro puedes hacer las consultas SQL que desees hacer.
 Para ver las tablas puedes ejecutar: `\d`
+
 Y para salir de postreSQL con: `exit`
 
 ## Uso de la API
