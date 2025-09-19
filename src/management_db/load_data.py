@@ -191,10 +191,15 @@ with app.app_context():
             fromNode_value = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == fromNode).one_or_none()
             toNode_value = db.session.query(Nodo).join(Gen).filter(Gen.locus_tag == toNode).one_or_none()
             if fromNode_value and toNode_value:
-                new_arista = Arista(id_from_node = fromNode_value.id_nodo, id_to_node = toNode_value.id_nodo, weight = peso) #fromNode_value es un objeto de modelado en models que tiene como atributo columnas y una de ellas es id_node
-                db.session.add(new_arista)
-                db.session.commit()
-                print(f"{fromNode_value.id_gen}: {fromNode}, {toNode_value.id_gen}: {toNode}, weight: {peso}")
+                existente = db.session.query(Arista).filter_by(id_from_node=fromNode_value.id_nodo, id_to_node=toNode_value.id_nodo, weight=peso).one_or_none()
+                if not existente:
+                    print("No existe la arista, se va a crear")
+                    new_arista = Arista(id_from_node = fromNode_value.id_nodo, id_to_node = toNode_value.id_nodo, weight = peso) #fromNode_value es un objeto de modelado en models que tiene como atributo columnas y una de ellas es id_node
+                    db.session.add(new_arista)
+                    db.session.commit()
+                    print(f"{fromNode_value.id_gen}: {fromNode}, {toNode_value.id_gen}: {toNode}, weight: {peso}")
+                else:
+                    print(f"Ya existe la arista: fromNode: {fromNode}, toNode: {toNode}, weight: {peso}")
             else:
                 #Estos genes tienen baja correlación, por eso no están en nodos.
                 edges_not_in_nodes.append((fromNode, toNode, peso))
