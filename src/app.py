@@ -13,13 +13,6 @@ CORS(app)
 
 db.init_app(app) #.init_app(app) es un método de la clase SQLAlchemy para vincular la bd con la aplicación de Flask creada en este archivo que se llama app. Conecta la app Flask con el objeto db del tipo: SQLAlchemy
 
-"""
-Los modelos definen las tablas con el objeto db de SQLAlchemy y en create_db.py se tiene:
-with app.app_context(): # with (una estructra de control que maneja contextos) permite que Flask-SQLAlchemy acceda a la configuración (URI de conexión)
-    db.create_all() # Crea las tablas gracias a lo definido en db en models.py y sabe dónde crearlas por el with de arriba.
-
-"""
-
 app.register_blueprint(expresion_app, url_prefix = '/expresion')
 app.register_blueprint(coexp_network, url_prefix = '/coexpresion_network')
 
