@@ -7,5 +7,5 @@ class Bacteria(db.Model):
 
     gen = db.relationship('Gen', back_populates='bacteria')
 
-    def __repr__(self): #Para cuando se quiere imprimir el objeto. Es una función que ves su representación.
+    def __repr__(self): #Para cuando se quiere imprimir el objeto. Es una función que ves la representación del objeto que modela un registro de la tabla bacteria.
         return print(f"id_bacteria: {self.id_bacteria}, bacteria: {self.bacteria}")

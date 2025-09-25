@@ -2,21 +2,21 @@
 ---------------------------------    Para continuar el proyecto  ---------------------------------
 Este es el archivo de python generado por ChatGPT-4 que genera las tablas en la base de datos
 de todas las relaciones (normalizadas hasta la 3ra forma normal por ChatGPT-4) que se encuentran
-en los 5 archivos de cada bacteria que están en el drive.
+en los 5 archivos de cada bacteria que están en el drive: https://drive.google.com/drive/folders/1rs2O2_eArKa3i87IL2WOfSW7LKr_eGi0?usp=drive_link
 
-En el proyecto solo ocupó e instanció en la base de datos 3 de estas tablas para desplegar
+En el proyecto solo se ocupó e instanció en la base de datos 3 de esas tablas .txt para desplegar
 específicamente el boxplot y la red de coexpresión; sin embargo, en este archivo se añaden todas las relaciones
 que genera la base de datos por si se desea trabajar con esos datos que también están disponibles.
-Diagrama entidad - relación explicado disponible los documentos del proyecto.
+Diagrama entidad relación explicado y disponible en los documentos del proyecto.
 
-Esos datos son:
+Las tablas que no se incluyen en la base de datos del proyecto, pero que se pueden añadir son:
 -   Genes que están relacionados a un factor de transcripción. (Se puede usar para cambiar la forma de los nodos en la red de coexpresión indicando si es un factor de transcripción)
 -   Tabla que describe los factores de transcripción. (Para dar información del TF)
 -   Tabla que describe cada muestra, incluyendo la condición experminetal y de referencia de la muestra. (Por si se quiere saber las condicones de cada muestra)
 
 Para llenar los registros en esta base de datos, es necesario hacer el archivo que lea los datos de los archivos .txt
-del drive y los pase a la base de datos, se suguiere hacerlo con el ORM SQLAchemy para que en un solo módulo python se lea
-el .txt y se inserten los valores en la base de datos.
+del drive y los inserte en la base de datos, se suguiere hacerlo con el ORM SQLAchemy para que en un solo módulo python se lea
+el .txt y se inserten los valores en la base de datos como se hace para las 6 tablas/modelos que sí se incluyen.
 
 """
 from src.management_db.db import db

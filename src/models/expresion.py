@@ -5,7 +5,7 @@ class Expresion(db.Model):
 
     id_gen = db.Column(db.Integer, db.ForeignKey('gen.id_gen'), primary_key=True)
     id_muestra = db.Column(db.Integer, nullable=False, primary_key=True) #Este valor podría estar ligado al id de la tabla Muestra, en este caso se insertan los valores de las columnas de la tabla colombosBacteria.txt
-    #Se colocó como llave priamria para que permitiera introcudir más de un valor de id_gen para cada muestra, además, si se añaden todas las tablas sería una llave foránea de Muestra
+    #Se colocó como llave priamria para que permitiera introducir más de un valor de id_gen para cada muestra, además, si se añaden todas las tablas sería una llave foránea de Muestra
     expresion = db.Column(db.Float, nullable=False) 
 
     gen = db.relationship('Gen', back_populates='expresiones')

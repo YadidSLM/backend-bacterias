@@ -7,7 +7,7 @@ class Arista(db.Model):
     id_from_node = db.Column(db.Integer, db.ForeignKey('nodo.id_nodo'), nullable=False)
     id_to_node = db.Column(db.Integer, db.ForeignKey('nodo.id_nodo'), nullable=False)
     weight = db.Column(db.Float)
-
+    # Define una restricción única para evitar duplicados exactos, pero permite múltiples aristas del mismo fromNode y toNode, pero con diferentes pesos
     __table_args__ = (
         db.UniqueConstraint('id_from_node', 'id_to_node', 'weight', name='uq_arista_from_to_weight'),
     )
