@@ -23,3 +23,4 @@ class Config:
     #Ver tablas con: \dt
     #Salir de psql con: \q
     #Describir tabla con: \d nombre_de_la_tabla
+    #Para hacer respaldos de la bd: pg_dump -U bacterias_user -h localhost -s -d bacterias > respaldo_bacterias.sql
