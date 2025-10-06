@@ -5,9 +5,9 @@ from src.app import app
 from src.models import Gen, Nodo, Arista, Coexp_modulo, Expresion, Bacteria
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Ecoli', 'colombosEcoli.txt')
-file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Ecoli', 'SignedCytoscapeInput-nodes-Ecoli-Bicor140.txt')
-file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Ecoli', 'Signed-CytoscapeInput-edges-Ecoli-Bicor140.txt')
+file_path_colombos = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'colombosypest.txt')
+file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'SignedCytoscapeInput-nodes-ypest-Bicor00.txt')
+file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'Signed-CytoscapeInput-edges-ypest-Bicor00.txt')
 #Signed-CytoscapeInput-edges-lt2.txt
 
 
@@ -29,14 +29,14 @@ id_bacteria  bacteria
 2   Tther
 3   Spneu
 4   Smeli   Para cargar archivos de otras bacterias, cambiar el nombre de los archivos colombos, nodes y edges a los de la bacteria que se quiera cargar.
-5   Sflex   Y cambiar bacterias[0] en la línea 89 por el índice de la bacteria que se quiera cargar, por ejemplo, para Mtube es bacterias[7], ojo que el índice es 7 aunque el id_bacteria es 6.
+5   Sflex   Y cambiar bacterias[0] en la línea 87 por el índice de la bacteria que se quiera cargar, por ejemplo, para Mtube es bacterias[7], ojo que el índice es 7 aunque el id_bacteria es 6.
 6   Sente
 7   Paeru
 8   Mtube
 9   Lrham
 10  Hpylo
 11  Ecoli
-12  CjejuB).j
+12  Cjeju
 13  Cacet
 14  Bthet
 15  Bsubt
@@ -53,9 +53,9 @@ with app.app_context():
             db.session.commit()
         else: #Al terminar el for
             print("Bacterias registradas en la DB")
-    except:
+    except Exception as e:
          db.session.rollback() #Hace que cancele los session.add y no se suban en el siguiente commit()
-         print("Ya se tienen estas bacterias en la BD")
+         print("Ya se tienen estas bacterias en la BD o error al insertar bacterias:", str(e))
     
 
 print(nodeModule.columns)
@@ -75,16 +75,16 @@ with app.app_context():
                 db.session.commit()
         else: #Al terminar el for
             print("Módulos registrados en la DB")
-    except:
+    except Exception as e:
          db.session.rollback() #Hace que cancele los session.add y no se suban en el siguiente commit()
          modulo.clear() #Libera espacio al borrar la lista de módulo que ya no se usa
-         print("Ya se tienen estos modulos en la BD")
+         print("Ya se tienen estos modulos en la BD o error al insertar colores:", str(e))
 
 #.itertuplas
 
 
 #Cargar genes
-indiceBacteria = 10 #Índice de la bacteria que se quiere cargar, por ejemplo, para Mtube es 7, ojo que el índice es 7 aunque el id_bacteria es 8.
+indiceBacteria = 0 #Índice de la bacteria que se quiere cargar: id_bacteria - 1, por ejemplo, para Mtube es 7, ojo que el índice es 7 aunque el id_bacteria es 8.
 for row in colombosBacteria['LocusTag']:
     if not(row in locusTag): #Asegura que no hay valores repetidos de locus tag
         locusTag.append(row)
@@ -132,12 +132,14 @@ with app.app_context():
                 if type(expr) is str:
                     print(f"{id_sample}, {expr}") #Este es el locus tag en cadena, por eso se aparta este valor y no se ingresa en la base de datos.            
                 else:
-                    if pd.isna(expr):
-                        print(expr)
-                        expr = 0
-                    new_expresion = Expresion(id_gen=id_locus_tag, id_muestra=id_sample, expresion=expr)
-                    db.session.add(new_expresion)
-                    db.session.commit()
+                    existente = db.session.query(Expresion).filter_by(id_gen=id_locus_tag, id_muestra=id_sample, expresion=expr).one_or_none()
+                    if not existente:
+                        if pd.isna(expr):
+                            print(expr)
+                            expr = 0
+                        new_expresion = Expresion(id_gen=id_locus_tag, id_muestra=id_sample, expresion=expr)
+                        db.session.add(new_expresion)
+                        db.session.commit()
     except Exception as e:
         db.session.rollback()
         all_LocusTags.clear()
@@ -156,18 +158,20 @@ with app.app_context():
             #Nodos
             # print(f"id_gen: {gen.locus_tag}, id_coexp_modulo: {moduleColor.nombre_modulo}")
             if(gen and moduleColor):
-                print(f"id_gen: {gen.id_gen}, id_coexp_modulo: {moduleColor.id_coexp_modulo}")
-                new_nodo = Nodo(id_gen = gen.id_gen, id_coexp_modulo = moduleColor.id_coexp_modulo)
-                db.session.add(new_nodo)
-                db.session.commit()
+                existente = db.session.query(Nodo).filter_by(id_gen=gen.id_gen, id_coexp_modulo=moduleColor.id_coexp_modulo).one_or_none()
+                if not existente:
+                    print(f"id_gen: {gen.id_gen}, id_coexp_modulo: {moduleColor.id_coexp_modulo}")
+                    new_nodo = Nodo(id_gen = gen.id_gen, id_coexp_modulo = moduleColor.id_coexp_modulo)
+                    db.session.add(new_nodo)
+                    db.session.commit()
             else:
                 print(f"No se obtuvieron datos requeridos {nodeName}, {module}")
                 break
         else:
             print("Nodos registrados en la BD")
-    except:
+    except Exception as e:
         db.session.rollback()
-        print("Ya se tienen estos nodos de nodes.txt en la BD")
+        print("Ya se tienen estos nodos de nodes.txt en la BD o erriror al insertar nodos:", str(e))
 
 #Cargar aristas
 dfArista_FN_TN_W = aristasDataFrame.loc[0:, ["fromNode", "toNode", "weight"]] #df es dataframe
@@ -188,7 +192,7 @@ with app.app_context():
                     print(f"Registrando {fromNode_value.id_gen}: {fromNode}, {toNode_value.id_gen}: {toNode}, weight: {peso}")
                 else:
                     print(f"Ya existe la arista: fromNode: {fromNode}, toNode: {toNode}, weight: {peso}")
-                    exit()
+                    continue
             else:
                 #Estos genes tienen baja correlación, por eso no están en nodos.
                 edges_not_in_nodes.append((fromNode, toNode, peso))
