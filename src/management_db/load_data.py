@@ -10,6 +10,7 @@ file_path_modulo = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'SignedCyto
 file_path_aristas = os.path.join(base_dir, '..', 'archivos', 'Ypest', 'Signed-CytoscapeInput-edges-ypest-Bicor00.txt')
 #Signed-CytoscapeInput-edges-lt2.txt
 
+exception_list = []
 
 colombosBacteria = pd.read_table(file_path_colombos)
 nodeModule = pd.read_table(file_path_modulo)
@@ -56,6 +57,7 @@ with app.app_context():
     except Exception as e:
          db.session.rollback() #Hace que cancele los session.add y no se suban en el siguiente commit()
          print("Ya se tienen estas bacterias en la BD o error al insertar bacterias:", str(e))
+         exception_list.append(str(e))
     
 
 print(nodeModule.columns)
@@ -79,6 +81,7 @@ with app.app_context():
          db.session.rollback() #Hace que cancele los session.add y no se suban en el siguiente commit()
          modulo.clear() #Libera espacio al borrar la lista de módulo que ya no se usa
          print("Ya se tienen estos modulos en la BD o error al insertar colores:", str(e))
+         exception_list.append(str(e))
 
 #.itertuplas
 
@@ -114,6 +117,7 @@ with app.app_context():
         db.session.rollback()
         locusTag.clear()
         print("Ya etsán los datos en la BD o Error al insertar genes:", str(e))
+        exception_list.append(str(e))
 
 #Cargar expresiones
 with app.app_context():
@@ -144,6 +148,7 @@ with app.app_context():
         db.session.rollback()
         all_LocusTags.clear()
         print("Ya se tienen las expresiones de colombos.txt en la BD, o Error al insertar expresiones:", str(e))
+        exception_list.append(str(e))
 
 #Cargar nodos
 nodosDataFrame = nodeModule.loc[0:, ["nodeName", "nodeAttr[nodesPresent, ]"]]
@@ -172,6 +177,7 @@ with app.app_context():
     except Exception as e:
         db.session.rollback()
         print("Ya se tienen estos nodos de nodes.txt en la BD o erriror al insertar nodos:", str(e))
+        exception_list.append(str(e))
 
 #Cargar aristas
 dfArista_FN_TN_W = aristasDataFrame.loc[0:, ["fromNode", "toNode", "weight"]] #df es dataframe
@@ -205,6 +211,10 @@ with app.app_context():
     except Exception as e:
         db.session.rollback()
         print("Ya están los datos en la BD o Error al insertar aristas:", str(e)) #El error es que no había nodos (de dfArista_FN_TN_W) en la BD nodo (y tampoco están en cyto..nodes.txt pues de esa tabla se llenó la tabla nodo), para que no cayera en el error se cambió de one() a one_or_none() para saber qué aristas intenta hacer la relación de la tabla edges.txt, pero no puede porque no están en nodos.
+        exception_list.append(str(e))
+
+for numEx, ex in enumerate(exception_list):
+    print(f"Excepción {numEx + 1}: {ex}")
 
 #Para Ypest, no hay nodos de las aristas que no estén en nodos (están completas las tablas .txt). SMELI es una bacteria que le faltan datos en sus tablas.
 print(edges_not_in_nodes) #Lista de tuplas (fromNode, toNode, weight) que no se encuentran en nodos. Se incluye esta lista por si le faltan datos a la tabla nodes.txt (como en el caso de SMELI) y se quieren agregar esos nodos faltantes a la tabla nodo de la BD.
