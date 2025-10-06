@@ -52,7 +52,7 @@ def getCoexprNetwork(locusTag):
     if suColor in mcolors.CSS4_COLORS.keys():
         suColor = mcolors.CSS4_COLORS[suColor]
     else:
-        suColor = "#a9825a" if suColor == "brown4" else "gray"
+        suColor = "#a9825a" if suColor == "brown4" else "grey"
     suLocus = node.gen.locus_tag
     aristasRaw = list(node.arista_from) + list(node.arista_to) #Hacer la unión de ambas listas
     print(len(aristasRaw))
@@ -89,13 +89,13 @@ def getCoexprNetwork(locusTag):
         if nodeTModule in mcolors.CSS4_COLORS.keys():
             nodeTModule = mcolors.CSS4_COLORS[nodeTModule]
         else:
-            nodeTModule = "brown" if nodeTModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
+            nodeTModule = "brown" if nodeTModule == "brown4" else "grey" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
             print(nodeTModule, "No se encontró en los colores de matplotlib")
         
         if nodeFModule in mcolors.CSS4_COLORS.keys():
             nodeFModule = mcolors.CSS4_COLORS[nodeFModule]
         else:
-            nodeFModule = "brown" if nodeFModule == "brown4" else "gray" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
+            nodeFModule = "brown" if nodeFModule == "brown4" else "grey" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
             print(nodeFModule, "No se encontró en los colores de matplotlib")
 
         
@@ -132,7 +132,7 @@ def getCoexprNetwork(locusTag):
 
     colores = []
     for _, dicciColor in G.nodes(data=True):
-        colores.append(dicciColor.get("color", "gray")) #Obtiene el color del diccionario, si no existe pone gray por defecto
+        colores.append(dicciColor.get("color", "grey")) #Obtiene el color del diccionario, si no existe pone grey por defecto
     pesos = []
     for _,_,dicciAristasNx in G.edges(data=True): #G.edges(data=True) coloca el atributo weight en un diccionario.
         pesos.append(dicciAristasNx["weight"] * 20)
@@ -159,3 +159,13 @@ def getCoexprNetwork(locusTag):
         "Lista de nodos" : f"{len(node_with_color_list)} ->{node_with_color_list}",
         "Lista aristas" : f"{arista_FNTNW_list}"
     })
+
+#Se puede añadir otra ruta que devuelva los locus_tag que están en el mismo módulo que el locus_tag ingresado en la url.
+"""
+    SELECT * FROM coexp_modulo
+    JOIN nodo
+    ON coexp_modulo.id_coexp_modulo=nodo.id_coexp_modulo
+    JOIN gen
+    ON nodo.id_gen=gen.id_gen
+    WHERE gen.locus_tag LIKE 'Y%' AND coexp_modulo.id_coexp_modulo = 10 #Ese id_coexp_modulo que es 10 le corresponde al color 
+"""
