@@ -9,6 +9,7 @@ import base64
 import io
 from flask import request
 import matplotlib.colors as mcolors
+import re
 
 coexp_network = Blueprint('coexp_network', __name__)
 
@@ -21,6 +22,29 @@ def fig_to_base64(fig, fmt="svg"): #Convierte la gráfica a imagen svg y luego a
     b64 = base64.b64encode(data).decode('ascii')
     mime = "image/svg+xml" if fmt == "svg" else "image/png"
     return f"data:{mime};base64,{b64}"
+
+def color_valido_para_red(modulo):
+    lista_colores_validos = list(mcolors.CSS4_COLORS.keys())
+    lista_colores_no_validos = []
+    if modulo in mcolors.CSS4_COLORS.keys():
+        modulo = mcolors.CSS4_COLORS[modulo]
+    else:
+        lista_colores_no_validos.append(modulo)
+        modulo_solo_letras = re.sub(r'[^a-zA-Z]', '', modulo) #Eliminar números y caracteres especiales
+        hex_modulo = mcolors.to_hex(modulo_solo_letras) #Convertir a hexadecimal
+        rgb_modulo = mcolors.to_rgb(modulo_solo_letras) #Convertir a rgb
+        gray = sum(rgb_modulo)/3
+        gray_rgb = (gray, gray, gray)
+        alpha = 0.4
+        nuevo_modulo = tuple((1 - alpha) * c + alpha * g for c, g in zip(rgb_modulo, gray_rgb))
+        print(f"\nEl módulo {modulo} no es un color válido. Se intentó convertir a color similar: \n {modulo_solo_letras} -> {hex_modulo} -> Desaturación del color con alfa: {alpha} -> {nuevo_modulo}")
+        modulo = mcolors.to_hex(nuevo_modulo) #Convertir a hexadecimal
+        
+        #Regresar un color por defecto filtrando el nombre del módulo con regex
+        #Buscar en la lista de colores a graficar si hay un color similar al módulo a cambiar color
+        #Si se encuentra un color similar, asignar un color más opaco o más claro.
+        #Si no se encuentra un color similar, asignar un color por defecto
+    return modulo #Devuelve un color válido.
 
 """
 1. Búsqueda en ambas columnas tanto en fromNode como en toNode
@@ -49,10 +73,7 @@ def getCoexprNetwork(locusTag):
     idnodo = node.id_nodo
     # aristasRaw = db.session.query(Arista).filter(Arista.id_arista == idnodo).one_or_none()
     suColor = node.modulo.nombre_modulo
-    if suColor in mcolors.CSS4_COLORS.keys():
-        suColor = mcolors.CSS4_COLORS[suColor]
-    else:
-        suColor = "#a9825a" if suColor == "brown4" else "grey"
+    suColor = color_valido_para_red(suColor)
     suLocus = node.gen.locus_tag
     aristasRaw = list(node.arista_from) + list(node.arista_to) #Hacer la unión de ambas listas
     print(len(aristasRaw))
@@ -89,14 +110,16 @@ def getCoexprNetwork(locusTag):
         if nodeTModule in mcolors.CSS4_COLORS.keys():
             nodeTModule = mcolors.CSS4_COLORS[nodeTModule]
         else:
+            print(nodeTModule, "No se encontró en los colores de matplotlib", nodeTLocus)
             nodeTModule = "brown" if nodeTModule == "brown4" else "grey" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
-            print(nodeTModule, "No se encontró en los colores de matplotlib")
+            
         
         if nodeFModule in mcolors.CSS4_COLORS.keys():
             nodeFModule = mcolors.CSS4_COLORS[nodeFModule]
         else:
+            print(nodeFModule, "No se encontró en los colores de matplotlib", nodeFLocus)
             nodeFModule = "brown" if nodeFModule == "brown4" else "grey" #Color por defecto si no se encuentra el módulo en los colores de matplotlib
-            print(nodeFModule, "No se encontró en los colores de matplotlib")
+            
 
         
         #Arma la lista con nodos de fromNode y toNode con su respectivo módulo
